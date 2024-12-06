@@ -23,3 +23,6 @@
 - Product_Category_or_Therapeutic_Area_1
 - Form_of_Payment_or_Transfer_of_Value
 - Delay_in_Publication_Indicator
+
+
+In some way include the outliers/big payers clinical trial link using the variable ClinicalTrials_Gov_Identifier
