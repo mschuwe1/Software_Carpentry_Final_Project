@@ -13,6 +13,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import requests
+from scipy import stats
 
 class DataAnalysisApp:
     def __init__(self, root):
@@ -133,8 +134,37 @@ class DataAnalysisApp:
                 messagebox.showerror("Error", f"Failed to load data from {selected_api}: {response.status_code}. Response: {response.text}")
         except Exception as e:
             messagebox.showerror("Error", f"Error fetching data from {selected_api}: {e}")
+#######
+#adding function to clean based on first removing with NaN in total amounts column, then eliminiate outliers
+#######
+
+    def clean_data(self):
+        """Clean data by removing rows with NaN in the total_amount_of_payment_usdollars column."""
+        if self.df is not None:
+            # Remove rows with NaN in 'total_amount_of_payment_usdollars'
+            self.df = self.df.dropna(subset=['total_amount_of_payment_usdollars'])
+
+            #Remove rows where 'total_amount_of_payment_usdollars' is 0
+            self.df = self.df[self.df['total_amount_of_payment_usdollars'] != 0]
+            
+            # Remove outliers: Keep values between 1st and 99th percentiles
+            lower_percentile = self.df['total_amount_of_payment_usdollars'].quantile(0.1)
+            upper_percentile = self.df['total_amount_of_payment_usdollars'].quantile(0.90)
+    
+            self.df = self.df[(self.df['total_amount_of_payment_usdollars'] >= lower_percentile) & 
+                              (self.df['total_amount_of_payment_usdollars'] <= upper_percentile)]
+            
+            messagebox.showinfo("Data Cleaned", "Rows with NaN values and outliers have been removed.")
+        else:
+            messagebox.showwarning("No Data", "Please load data first!")
 
 
+
+
+
+
+
+    
     def show_basic_stats(self):
         """Display basic statistics of the data."""
         if self.df is not None:
@@ -186,7 +216,15 @@ class DataAnalysisApp:
                 if data.empty:
                     messagebox.showwarning("No Data", f"No valid numeric data in column '{selected_column}'.")
                     return
-            
+
+                # Calculate statistics
+                mean_value = data.mean()
+                median_value = data.median()
+                mode_value = data.mode()[0] if not data.mode().empty else 'N/A'
+                range_value = data.max() - data.min()
+
+
+                
                 # Calculate optimal bins using Freedman-Diaconis rule
                 q75, q25 = data.quantile([0.75, 0.25])
                 iqr = q75 - q25  # Interquartile range
@@ -201,9 +239,19 @@ class DataAnalysisApp:
                 plt.ylabel("Frequency", fontsize=14)
                 plt.grid(True, linestyle='--', alpha=0.7)  # Add gridlines for better readability
                 plt.tight_layout()  # Adjust layout to fit elements nicely
+                
+
+                # Display statistics as an annotation on the plot
+                stats_text = (f"Mean: {mean_value:.2f}\n"
+                              f"Median: {median_value:.2f}\n"
+                              f"Mode: {mode_value}\n"
+                              f"Range: {range_value:.2f}")
+                plt.gca().text(0.95, 0.95, stats_text, transform=plt.gca().transAxes,
+                               fontsize=12, verticalalignment='top', horizontalalignment='right',
+                               bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=1'))
+
                 plt.show()
-
-
+                
             generate_button = tk.Button(histogram_window, text="Generate Histogram", command=generate_histogram, font=("Arial", 12))
             generate_button.pack(pady=10)
     
