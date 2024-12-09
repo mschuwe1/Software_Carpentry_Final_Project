@@ -51,7 +51,7 @@ class DataAnalysisApp:
             label="Show Missing Data", command=self.show_missing_data)
         menu_bar.add_cascade(label="Analysis", menu=analysis_menu)
         analysis_menu.add_command(
-            label="Search by Profile ID", command=self.search_by_profile_id)
+            label="Search Principal Investigator", command=self.search_by_pi)
 
         # Add "Visualization" menu
         visualize_menu = tk.Menu(menu_bar, tearoff=0)
@@ -496,44 +496,96 @@ class DataAnalysisApp:
         else:
             messagebox.showwarning("No Data", "Please load data first!")
 
-    def search_by_profile_id(self):
-        """Search for rows with a specific Profile ID and display them."""
+    def search_by_pi(self):
+        """Search for rows based on PI's profile ID, first name, and/or last name."""
         if self.df is not None:
-            # Prompt the user to enter the Profile ID
-            profile_id = simpledialog.askstring(
-                "Search Profile ID", "Enter the Profile ID to search:"
-            )
+            # Prompt the user to enter the search criteria
+            search_window = tk.Toplevel(self.root)
+            search_window.title("Search Principal Investigator")
 
-            if profile_id:
-                # Filter the DataFrame for matching rows
-                matching_rows = self.df[self.df['principal_investigator_1_profile_id'] == profile_id]
+            # Create input fields for Profile ID, First Name, and Last Name
+            tk.Label(search_window, text="Profile ID:",
+                     font=("Arial", 12)).pack(pady=5)
+            profile_id_entry = tk.Entry(search_window)
+            profile_id_entry.pack(pady=5)
 
-                if matching_rows.empty:
+            tk.Label(search_window, text="First Name:",
+                     font=("Arial", 12)).pack(pady=5)
+            first_name_entry = tk.Entry(search_window)
+            first_name_entry.pack(pady=5)
+
+            tk.Label(search_window, text="Last Name:",
+                     font=("Arial", 12)).pack(pady=5)
+            last_name_entry = tk.Entry(search_window)
+            last_name_entry.pack(pady=5)
+
+            def perform_search():
+                """Perform the search based on entered criteria."""
+                profile_id = profile_id_entry.get().strip()
+                first_name = first_name_entry.get().strip()
+                last_name = last_name_entry.get().strip()
+
+                # Apply filters dynamically based on entered values
+                filtered_df = self.df.copy()
+                if profile_id:
+                    filtered_df = filtered_df[filtered_df['principal_investigator_1_profile_id'] == profile_id]
+                if first_name:
+                    filtered_df = filtered_df[filtered_df['principal_investigator_1_first_name'].str.contains(
+                        first_name, case=False, na=False)]
+                if last_name:
+                    filtered_df = filtered_df[filtered_df['principal_investigator_1_last_name'].str.contains(
+                        last_name, case=False, na=False)]
+
+                # Check if any rows match the criteria
+                if filtered_df.empty:
                     messagebox.showinfo(
-                        "No Results", f"No rows found with Profile ID: {profile_id}")
+                        "No Results", "No matching rows found for the provided criteria.")
                     return
 
-                # Create a new Toplevel window to display the results
+                # Display the matching rows
                 results_window = tk.Toplevel(self.root)
-                results_window.title(f"Results for Profile ID: {profile_id}")
+                results_window.title("Search Results")
 
-                # Add a Text widget to display the results
                 results_text = tk.Text(
                     results_window, wrap=tk.WORD, font=("Arial", 10))
                 results_text.pack(fill=tk.BOTH, expand=True)
+                results_text.insert(tk.END, filtered_df.to_string(index=False))
 
-                # Insert the matching rows into the Text widget
-                results_text.insert(
-                    tk.END, matching_rows.to_string(index=False))
+                def export_results():
+                    """Export the search results to an Excel or CSV file."""
+                    file_path = tk.filedialog.asksaveasfilename(
+                        defaultextension=".csv",
+                        filetypes=[("CSV files", "*.csv"),
+                                   ("Excel files", "*.xlsx")],
+                        title="Save Results"
+                    )
+                    if file_path:
+                        try:
+                            if file_path.endswith(".xlsx"):
+                                filtered_df.to_excel(file_path, index=False)
+                            else:
+                                filtered_df.to_csv(file_path, index=False)
+                            messagebox.showinfo(
+                                "Export Successful", f"Results exported to {file_path}")
+                        except Exception as e:
+                            messagebox.showerror(
+                                "Export Error", f"An error occurred while exporting: {e}")
+
+                # Add an Export button
+                tk.Button(results_window, text="Export",
+                          command=export_results, font=("Arial", 12)).pack(pady=10)
 
                 # Add a Close button
-                close_button = tk.Button(
-                    results_window, text="Close", command=results_window.destroy, font=("Arial", 12)
-                )
-                close_button.pack(pady=10)
-            else:
-                messagebox.showwarning(
-                    "Input Needed", "Please enter a Profile ID to search.")
+                tk.Button(results_window, text="Close", command=results_window.destroy, font=(
+                    "Arial", 12)).pack(pady=10)
+
+            # Add a Search button
+            tk.Button(search_window, text="Search",
+                      command=perform_search, font=("Arial", 12)).pack(pady=20)
+
+            # Add a Close button
+            tk.Button(search_window, text="Close", command=search_window.destroy, font=(
+                "Arial", 12)).pack(pady=10)
         else:
             messagebox.showwarning("No Data", "Please load data first!")
 
