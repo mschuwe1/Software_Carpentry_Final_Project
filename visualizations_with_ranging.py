@@ -50,19 +50,23 @@ class DataAnalysisApp:
         analysis_menu.add_command(
             label="Show Missing Data", command=self.show_missing_data)
         menu_bar.add_cascade(label="Analysis", menu=analysis_menu)
+        analysis_menu.add_command(
+            label="Search by Profile ID", command=self.search_by_profile_id)
 
         # Add "Visualization" menu
         visualize_menu = tk.Menu(menu_bar, tearoff=0)
         visualize_menu.add_command(
             label="Histogram", command=self.plot_histogram)
-        visualize_menu.add_command(
-            label="Scatter Plot", command=self.plot_scatter)
-        visualize_menu.add_command(
-            label="Pair Plot", command=self.plot_pairplot)
         menu_bar.add_cascade(label="Visualization", menu=visualize_menu)
         # Mitch's addtion for Investigators
         visualize_menu.add_command(
             label="Investigators Count", command=self.plot_investigators_count)
+
+        # Saved for potential future use of Scatter and Pair Plots
+        # visualize_menu.add_command(
+        #     label="Scatter Plot", command=self.plot_scatter)
+        # visualize_menu.add_command(
+        #     label="Pair Plot", command=self.plot_pairplot)
 
         # Attach the menu to the root window
         self.root.config(menu=menu_bar)
@@ -97,7 +101,7 @@ class DataAnalysisApp:
         test_label.pack(pady=20)  # Adding padding for better spacing
 
         # Add a scrollbar for the Text widget
-       # scrollbar = tk.Scrollbar(missing_window, command=missing_text.yview)
+        # scrollbar = tk.Scrollbar(missing_window, command=missing_text.yview)
         # scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         # missing_text.config(yscrollcommand=scrollbar.set)
 
@@ -195,62 +199,6 @@ class DataAnalysisApp:
                                  selected_api}: {e}")
 
 
-#################
-# #Appends to DF each API pull
-#                         # Append this batch of data to the main DataFrame
-#                         self.df = pd.concat([self.df, normalized_data], ignore_index=True)
-
-#                         print(f"Loaded {len(results)} records, total: {len(self.df)} records.")
-
-#                     offset += limit
-#                 else:
-#                     messagebox.showerror("Error", f"Failed to load data from {selected_api}: {response.status_code}. Response: {response.text}")
-#                     break
-
-#             if not self.df.empty:
-#                 messagebox.showinfo("Data Loaded", f"Data successfully loaded from {selected_api} with {len(self.df)} records.")
-#                 print(self.df.head())  # Debugging: see the first 5 rows of the data
-#             else:
-#                 messagebox.showwarning("No Data", "No data was loaded from the API.")
-#         except Exception as e:
-#             messagebox.showerror("Error", f"Error fetching data from {selected_api}: {e}")
-  #### ####################################
-# '''
-#             # Fetch data from the selected API without any parameters
-#             print(f"Requesting URL: {api_url}")
-#             response = requests.get(api_url)
-
-#             if response.status_code == 200:
-#                 # Extract the results portion and load it into the DataFrame
-#                 database = response.json()
-#                 self.df = pd.json_normalize(database['results'])  # Load 'results' into DataFrame
-#                 # Limit to desired columns only (check if columns exist)
-#                 ####
-#                 missing_columns = [col for col in desired_columns if col not in self.df.columns]
-
-#                 if missing_columns:
-#                 # If there are missing columns, show an error message
-#                     missing_columns_str = ', '.join(missing_columns)
-#                     messagebox.showerror("Missing Columns", f"The following columns are missing: {missing_columns_str}")
-#                     return  # Stop execution if columns are missing
-#                 else:
-#                 # If no columns are missing, filter the DataFrame to keep only the desired columns
-#                     self.df = self.df[desired_columns]
-#                     messagebox.showinfo("Data Loaded", f"Data successfully loaded from {selected_api} with {len(self.df)} records.")
-#                     print(self.df.head())  # Debugging: see the first 5 rows of the data
-
-
-#                 ####
-#                 #self.df = self.df[desired_columns] if all(col in self.df.columns for col in desired_columns) else self.df
-#                 #messagebox.showinfo("Data Loaded", f"Data successfully loaded from {selected_api} with {len(self.df)} records.")
-#                 #print(self.df.head())# Debugging: see the first 5 rows of the data
-#                 #print(self.df.columns())
-
-#             else:
-#                 messagebox.showerror("Error", f"Failed to load data from {selected_api}: {response.status_code}. Response: {response.text}")
-#         except Exception as e:
-#             messagebox.showerror("Error", f"Error fetching data from {selected_api}: {e}")
-# '''
 #######
 # adding function to clean based on first removing with NaN in total amounts column, then eliminiate outliers
 #######
@@ -547,71 +495,44 @@ class DataAnalysisApp:
         else:
             messagebox.showwarning("No Data", "Please load data first!")
 
-
-# MITCH END
-
-#    def plot_scatter(self):
-#        """Generate a scatter plot of two selected columns."""
-#        if self.df is not None:
-#            columns = self.get_columns_for_scatter()
-#            if columns:
-        # Scatter plot using Seaborn
-#                sns.scatterplot(x=self.df[columns[0]], y=self.df[columns[1]])
-#                plt.title(f"Scatter Plot: {columns[0]} vs {columns[1]}")
-#                plt.xlabel(columns[0])
-#                plt.ylabel(columns[1])
-#                plt.show()
-#        else:
-#            messagebox.showwarning("No Data", "Please load data first!")
-
-
-    def plot_scatter(self):
-        """Generate a scatter plot of two selected columns and display it in the UI."""
+    def search_by_profile_id(self):
+        """Search for rows with a specific Profile ID and display them."""
         if self.df is not None:
-            columns = self.get_columns_for_scatter()  # Get user-selected columns
-            if columns:
-                column_x, column_y = columns
+            # Prompt the user to enter the Profile ID
+            profile_id = simpledialog.askstring(
+                "Search Profile ID", "Enter the Profile ID to search:"
+            )
 
-                # Create a figure for the scatter plot
-                plt.figure(figsize=(6, 6))
-                sns.scatterplot(x=self.df[column_x], y=self.df[column_y])
-                plt.title(f"Scatter Plot: {column_x} vs {column_y}")
-                plt.xlabel(column_x)
-                plt.ylabel(column_y)
+            if profile_id:
+                # Filter the DataFrame for matching rows
+                matching_rows = self.df[self.df['principal_investigator_1_profile_id'] == profile_id]
 
-                # Create a Toplevel window to display the plot
-                plot_window = tk.Toplevel(self.root)
-                plot_window.title(f"Scatter Plot: {column_x} vs {column_y}")
+                if matching_rows.empty:
+                    messagebox.showinfo(
+                        "No Results", f"No rows found with Profile ID: {profile_id}")
+                    return
 
-                # Create a Frame to hold the plot
-                plot_frame = tk.Frame(plot_window)
-                plot_frame.pack(fill=tk.BOTH, expand=True)
+                # Create a new Toplevel window to display the results
+                results_window = tk.Toplevel(self.root)
+                results_window.title(f"Results for Profile ID: {profile_id}")
 
-                # Create the canvas to embed the plot
-                # Pass the matplotlib figure to the canvas
-                canvas = FigureCanvasTkAgg(plt.gcf(), master=plot_frame)
-                canvas.draw()
+                # Add a Text widget to display the results
+                results_text = tk.Text(
+                    results_window, wrap=tk.WORD, font=("Arial", 10))
+                results_text.pack(fill=tk.BOTH, expand=True)
 
-                # Pack the canvas into the plot frame
-                canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+                # Insert the matching rows into the Text widget
+                results_text.insert(
+                    tk.END, matching_rows.to_string(index=False))
 
-                # Optional: Add a close button to close the plot window
+                # Add a Close button
                 close_button = tk.Button(
-                    plot_window, text="Close", command=plot_window.destroy, font=("Arial", 12))
+                    results_window, text="Close", command=results_window.destroy, font=("Arial", 12)
+                )
                 close_button.pack(pady=10)
-
             else:
                 messagebox.showwarning(
-                    "Invalid Input", "Please select valid column names.")
-        else:
-            messagebox.showwarning("No Data", "Please load data first!")
-
-    def plot_pairplot(self):
-        """Generate a pairplot of the DataFrame."""
-        if self.df is not None:
-            # Pair plot using Seaborn (pairwise relationships between numerical columns)
-            sns.pairplot(self.df)
-            plt.show()
+                    "Input Needed", "Please enter a Profile ID to search.")
         else:
             messagebox.showwarning("No Data", "Please load data first!")
 
@@ -627,55 +548,6 @@ class DataAnalysisApp:
                     "Invalid Input", "Please enter a valid column name.")
                 return None
         return None
-
-    def get_columns_for_scatter(self):
-        """Prompt user to select two columns for the scatter plot."""
-        if self.df is not None:
-            scatter_window = tk.Toplevel(self.root)
-            scatter_window.title("Select Columns for Scatter Plot")
-
-            # Dropdowns for column selection
-            column_x_var = tk.StringVar(scatter_window)
-            column_y_var = tk.StringVar(scatter_window)
-
-            column_x_var.set(self.df.columns[0])  # Default to first column
-            column_y_var.set(self.df.columns[1])  # Default to second column
-
-            column_x_dropdown = tk.OptionMenu(
-                scatter_window, column_x_var, *self.df.columns)
-            column_y_dropdown = tk.OptionMenu(
-                scatter_window, column_y_var, *self.df.columns)
-
-            column_x_dropdown.pack(pady=10)
-            column_y_dropdown.pack(pady=10)
-
-            def generate_scatter_plot():
-                selected_column_x = column_x_var.get()
-                selected_column_y = column_y_var.get()
-
-                if selected_column_x in self.df.columns and selected_column_y in self.df.columns:
-                    sns.scatterplot(
-                        x=self.df[selected_column_x], y=self.df[selected_column_y])
-                    plt.title(f"Scatter Plot: {selected_column_x} vs {
-                              selected_column_y}")
-                    plt.xlabel(selected_column_x)
-                    plt.ylabel(selected_column_y)
-                    plt.show()
-
-            generate_button = tk.Button(
-                scatter_window, text="Generate Scatter Plot", command=generate_scatter_plot)
-            generate_button.pack(pady=10)
-
-            scatter_window.mainloop()
-
-    #### MITCH ADDITION ####
-    # def show_columns(self):
-    #     """Display the list of column names in the DataFrame."""
-    #     if self.df is not None:
-    #         columns = self.df.columns.tolist()  # Get the list of column names
-    #         messagebox.showinfo("Column Options", f"Available Columns:\n{', '.join(columns)}")
-    #     else:
-    #         messagebox.showwarning("No Data", "Please load data first!")
 
     def show_columns(self):
         """Display the list of column names in a new window."""
