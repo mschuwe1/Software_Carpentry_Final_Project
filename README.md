@@ -38,3 +38,20 @@ _Applicable_GPO_Name"
 - verify if the missing values are actually missing or some other non-alpha value
 - try to 
   
+Dec 9 To Do:
+
+Mark 
+- rename the variables on the user side
+- truncate physician specilaty variable
+- get basic stats to display mean median range
+- unit testing  
+
+
+Mitch
+- remove scatter plot
+- add tool for looking up investigator by name and by hospital name
+-   Covered_Recipient_First_Name
+-   Covered_Recipient_Middle_Name
+-   Covered_Recipient_Last_Name
+-   Covered_Recipient_Name_Suffix
+-   Teaching_Hospital_Name
