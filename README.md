@@ -6,6 +6,7 @@ This database is published every year and details the payments various pharmaceu
 make to physicians and hospitals. 
 
 # Prerequisites
+- A txt file is also available on the repository "requirements.txt" that outlines the libraries and versions below:
 - Python 3.0 or higher
 - Required Libraries:
     - Numpy
