@@ -16,7 +16,9 @@ make to physicians and hospitals.
     - scypy
  
 # Usage
-Clone the repository
+Clone the Final_Submission.py file
+
+
 The script will open a UI asking the user to select from a dropdown menu the CMS database to query. 
 For the purposes of this project, the database is limited to the most recent publication regarding Research Payments.
 The tool automatically quereies the CMS database's API, and dowloads the data into a pandas dataframe. 
