@@ -636,7 +636,26 @@ class DataAnalysisApp:
             last_name_entry.pack(pady=5)
 
             def perform_search():
-                """Perform the search based on entered criteria."""
+                """
+                Perform a search for rows in the DataFrame based on entered PI criteria.
+                
+                This function:
+                1. Retrieves user-input values for PI's profile ID, first name, and/or last name.
+                2. Filters the DataFrame dynamically based on the provided criteria.
+                3. Displays the matching rows in a new window.
+                4. Allows the user to export the search results to a CSV or Excel file.
+                
+                Preconditions:
+                - The DataFrame must be loaded with the columns:
+                  - 'principal_investigator_1_profile_id'
+                  - 'principal_investigator_1_first_name'
+                  - 'principal_investigator_1_last_name'
+                
+                Raises:
+                - A warning if no matching rows are found based on the entered criteria.
+                - An error if exporting the results fails due to an invalid file path or write error.
+                """
+                
                 profile_id = profile_id_entry.get().strip()
                 first_name = first_name_entry.get().strip()
                 last_name = last_name_entry.get().strip()
@@ -668,7 +687,21 @@ class DataAnalysisApp:
                 results_text.insert(tk.END, filtered_df.to_string(index=False))
 
                 def export_results():
-                    """Export the search results to an Excel or CSV file."""
+                    """
+                    Export the filtered search results to a CSV or Excel file.
+                    
+                    This function:
+                    1. Opens a file dialog for the user to select the file name and format (CSV or Excel).
+                    2. Saves the current filtered DataFrame to the chosen file.
+                    
+                    Preconditions:
+                    - A filtered DataFrame must be available from the search results.
+                    
+                    Raises:
+                    - An error if the file cannot be written due to an invalid path or permissions issue.
+                    - A warning if the user cancels the save dialog.
+                    """
+
                     file_path = tk.filedialog.asksaveasfilename(
                         defaultextension=".csv",
                         filetypes=[("CSV files", "*.csv"),
@@ -706,7 +739,24 @@ class DataAnalysisApp:
             messagebox.showwarning("No Data", "Please load data first!")
 
     def get_column_for_plot(self):
-        """Prompt user to select a column for the plot."""
+        """
+        Prompt the user to select a column for a plot.
+        
+        This function:
+        1. Opens a dialog box for the user to input the name of a column.
+        2. Validates the input to ensure the column exists in the DataFrame.
+        3. Returns the selected column name if valid.
+        
+        Preconditions:
+        - The DataFrame must be loaded.
+        
+        Returns:
+        - The name of the selected column if it exists in the DataFrame.
+        
+        Raises:
+        - A warning if the input is invalid or the column does not exist in the DataFrame.
+        """
+
         if self.df is not None:
             column = simpledialog.askstring(
                 "Input", "Enter column name for the histogram:")
@@ -719,7 +769,21 @@ class DataAnalysisApp:
         return None
 
     def show_columns(self):
-        """Display the list of column names in a new window."""
+        """
+        Display the list of column names in the DataFrame.
+        
+        This function:
+        1. Opens a new window to display all column names from the loaded DataFrame.
+        2. Uses a listbox widget to present the column names for easy viewing.
+        3. Includes a Close button to exit the window.
+        
+        Preconditions:
+        - The DataFrame must be loaded.
+        
+        Raises:
+        - A warning if no data is loaded into the DataFrame.
+        """
+
         if self.df is not None:
             # Create a new Toplevel window
             columns_window = tk.Toplevel(self.root)
