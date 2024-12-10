@@ -297,7 +297,27 @@ class DataAnalysisApp:
             messagebox.showwarning("No Data", "Please load data first!")
 
     def plot_histogram(self):
-        """Generate a histogram of a chosen column with adjustable bin width and maximum X-axis, with statistics displayed."""
+        """
+        Generate a histogram for a selected column with options for bin width and maximum X-axis.
+        
+        This function creates a UI window where the user can:
+        1. Select a column from the loaded DataFrame.
+        2. Specify the bin width for the histogram (optional).
+        3. Set a maximum value for the X-axis (optional).
+        
+        The histogram displays:
+        - A density curve (KDE) alongside the histogram.
+        - Summary statistics (mean, median, mode, and range) as a text box on the plot.
+        
+        Uses seaborn for visualization and matplotlib for plotting adjustments.
+        
+        Preconditions:
+        - A DataFrame must be loaded with numeric data in the selected column.
+        
+        Raises:
+        - A warning if no data is available.
+        - A ValueError if the bin width or max X-axis input is invalid.
+        """
         if self.df is not None:
             # Create a new Toplevel window for column selection, bin width, and max X-axis
             histogram_window = tk.Toplevel(self.root)
