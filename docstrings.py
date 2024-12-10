@@ -470,12 +470,6 @@ class DataAnalysisApp:
                                            investigator_column}.")
                     return
 
-                # Create a filtered DataFrame
-                filtered_df = self.df.copy()
-                if filter_missing_var.get():
-                    filtered_df = filtered_df.dropna(
-                        subset=[selected_variable])
-
                 # Group by the selected variable and count unique investigators
                 investigator_counts = filtered_df.groupby(
                     selected_variable)[investigator_column].nunique().reset_index()
