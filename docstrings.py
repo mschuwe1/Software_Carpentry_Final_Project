@@ -353,6 +353,25 @@ class DataAnalysisApp:
 
             # Button to generate the histogram
             def generate_histogram():
+                """
+                Generate and display a histogram for the selected column.
+                
+                This function processes the selected column from the DataFrame and:
+                1. Calculates an appropriate number of bins based on user-provided bin width or the Freedman-Diaconis rule.
+                2. Plots the histogram with a density curve (KDE) using seaborn.
+                3. Optionally restricts the X-axis range to a user-defined maximum value.
+                4. Annotates the plot with summary statistics (mean, median, mode, and range).
+                
+                Preconditions:
+                - The DataFrame must be loaded with numeric data in the selected column.
+                - Valid numeric values must be entered for optional bin width and maximum X-axis range, if provided.
+                
+                Raises:
+                - A warning if no valid numeric data is available for the selected column.
+                - An error if user-provided inputs (bin width or max X-axis) are not numeric.
+                
+                """
+
                 selected_column = column_var.get()
                 # Drop NaN values for clean plotting
                 data = self.df[selected_column].dropna()
@@ -444,7 +463,24 @@ class DataAnalysisApp:
             messagebox.showwarning("No Data", "Please load data first!")
 
     def plot_investigators_count(self):
-        """Generate a count of unique investigators grouped by different variables."""
+        """
+        Generate a bar plot showing the count of unique investigators grouped by a selected variable.
+        
+        This function creates a UI window where the user can:
+        1. Select a column from the DataFrame to group the investigators by.
+        2. Optionally specify a minimum and/or maximum count to filter the results.
+        
+        The resulting bar plot uses seaborn to display:
+        - The unique count of investigators for each category in the selected column.
+        
+        Preconditions:
+        - The DataFrame must be loaded and contain the 'principal_investigator_1_profile_id' column.
+        
+        Raises:
+        - A warning if the selected column is invalid or not present in the DataFrame.
+        - A ValueError if the minimum or maximum count inputs are not valid numbers.
+        """
+
         if self.df is not None:
             # Create a new Toplevel window for variable selection
             count_window = tk.Toplevel(self.root)
