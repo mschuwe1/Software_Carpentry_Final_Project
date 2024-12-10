@@ -545,7 +545,7 @@ class DataAnalysisApp:
                     return
 
                 # Group by the selected variable and count unique investigators
-                investigator_counts = filtered_df.groupby(
+                investigator_counts = df.groupby(
                     selected_variable)[investigator_column].nunique().reset_index()
                 investigator_counts.columns = [
                     selected_variable, 'Investigator Count']
