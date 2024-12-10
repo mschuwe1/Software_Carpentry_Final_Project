@@ -514,6 +514,24 @@ class DataAnalysisApp:
 
             # Button to generate the count plot
             def generate_count_plot():
+                """
+                Generate a bar plot based on the count of unique investigators grouped by a selected variable.
+                
+                This function:
+                1. Groups the DataFrame by the user-selected column.
+                2. Counts the unique occurrences of 'principal_investigator_1_profile_id' for each group.
+                3. Optionally filters the results based on user-specified minimum and/or maximum count values.
+                4. Plots the filtered data as a bar plot using seaborn.
+                
+                Preconditions:
+                - The DataFrame must be loaded and contain the 'principal_investigator_1_profile_id' column.
+                
+                Raises:
+                - A warning if the selected column is not present in the DataFrame.
+                - An error if the minimum or maximum count inputs are invalid (non-numeric).
+                
+                """
+
                 selected_variable = variable_var.get()
                 if selected_variable not in self.df.columns:
                     messagebox.showwarning("Invalid Column", f"{
@@ -579,7 +597,23 @@ class DataAnalysisApp:
             messagebox.showwarning("No Data", "Please load data first!")
 
     def search_by_pi(self):
-        """Search for rows based on PI's profile ID, first name, and/or last name."""
+        """
+        Search for rows in the DataFrame based on PI's profile ID, first name, and/or last name.
+        
+        This function opens a UI window where the user can:
+        1. Enter a profile ID, first name, last name, or any combination of these to filter the DataFrame.
+        2. View the matching rows in a new window.
+        3. Optionally export the search results to a CSV or Excel file.
+        
+        Preconditions:
+        - The DataFrame must be loaded with the columns:
+          - 'principal_investigator_1_profile_id'
+          - 'principal_investigator_1_first_name'
+          - 'principal_investigator_1_last_name'
+        
+        Raises:
+        - A warning if no data is available or if the search yields no results.
+        """
         if self.df is not None:
             # Prompt the user to enter the search criteria
             search_window = tk.Toplevel(self.root)
