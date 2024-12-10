@@ -443,12 +443,6 @@ class DataAnalysisApp:
                 count_window, variable_var, *self.df.columns)
             variable_dropdown.pack(pady=10)
 
-            # Checkbox to toggle filtering out missing data
-            filter_missing_var = tk.BooleanVar()
-            filter_missing_checkbox = tk.Checkbutton(
-                count_window, text="Filter out missing data", variable=filter_missing_var)
-            filter_missing_checkbox.pack(pady=10)
-
             # Add entry fields for minimum and maximum counts
             min_label = tk.Label(
                 count_window, text="Minimum Count:", font=("Arial", 12))
